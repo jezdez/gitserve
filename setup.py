@@ -7,7 +7,7 @@ from gitserve.__init__ import __version__ as VERSION
 setup(
     name='gitserve',
     version=VERSION,
-    license="GPL",
+    license="bsd",
     description="A helper tool for git that mimics mercurial\'s serve command",
     author='Jannis Leidel',
     author_email='jannis@leidel.info',
