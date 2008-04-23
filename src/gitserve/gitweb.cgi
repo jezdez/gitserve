@@ -32,7 +32,8 @@ our $my_uri = $cgi->url(-absolute => 1);
 our $GIT = "/usr/bin/git";
 
 # absolute fs-path which will be prepended to the project path
-our $projectroot = "/pub/scm";
+#our $projectroot = "/pub/scm";
+our $projectroot = "/pub/git";
 
 # fs traversing limit for getting project list
 # the number is relative to the projectroot

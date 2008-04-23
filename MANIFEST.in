@@ -1,2 +1,1 @@
-recursive-include gitserve/cgi-bin *
 recursive-include gitserve/media *
