@@ -1,0 +1,8 @@
+Thanks for downloading git-serve.
+
+To install it, run the following command inside this directory:
+
+    sudo python setup.py install
+
+Note that this application requires Python 2.3 or later, and a recent
+version of setuptools.
