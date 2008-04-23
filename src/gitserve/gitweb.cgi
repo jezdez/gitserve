@@ -367,7 +367,7 @@ sub filter_snapshot_fmts {
 
 }
 
-our $GITWEB_CONFIG = $ENV{'GITWEB_CONFIG'} || "./gitweb.conf";
+our $GITWEB_CONFIG = $ENV{'GITWEB_CONFIG'} || "/etc/gitweb.conf";
 do $GITWEB_CONFIG if -e $GITWEB_CONFIG;
 
 # version of the core git binary
