@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # encoding: utf-8
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 import os
 import sys
@@ -166,7 +166,7 @@ def main():
 
     listen = options.address, options.port
     gitweb_url = "http://%s:%d/%s/" % (options.address, options.port, repo_name)
-    gitweb_cgi = os.path.join(gitserve_dir, 'gitweb.cgi')
+    gitweb_cgi = os.path.join(gitserve_dir, 'gitweb.cgi.so')
 
     # start daemon mode
     if options.daemon:

@@ -2,4 +2,4 @@ include README.txt
 include LICENSE.txt
 include MANIFEST.in
 include INSTALL.txt
-recursive-include gitserve/media *
+recursive-include src/gitserve/media *
