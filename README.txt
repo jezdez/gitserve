@@ -37,6 +37,7 @@ Usage pretty easy::
       -d, --daemon          detach from terminal and become a daemon
       --pid-file=PIDFILE    write the spawned process-id to this file
       --gitweb=GITWEB       use this gitweb cgi file instead of the included
+                            version
 
 As the only argument you can specify a directory that contains your git
 projects. If you leave this argument blank ``git-serve`` will automatically uses
