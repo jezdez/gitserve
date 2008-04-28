@@ -31,10 +31,12 @@ Usage pretty easy::
       -q, --quiet           don't print anything to stdout
       -p PORT, --port=PORT  port to listen on (default: 8000)
       -a ADDRESS, --address=ADDRESS
-                            address to listen on (default: all interfaces)
+                            address to listen on (default: hostname)
+      -l, --local           only listen on 127.0.0.1
       -b, --browser         open default browser automatically
       -d, --daemon          detach from terminal and become a daemon
       --pid-file=PIDFILE    write the spawned process-id to this file
+      --gitweb=GITWEB       use this gitweb cgi file instead of the included
 
 As the only argument you can specify a directory that contains your git
 projects. If you leave this argument blank ``git-serve`` will automatically uses
@@ -52,7 +54,8 @@ port 8000, for example: http://127.0.0.1:8000/
 
 If you provide a ``--port`` or ``--address`` option while starting ``git-serve``
 you can have ``git-serve`` listen on your choices. You need to be root to run it
-on port 80 or any other port below 1024.
+on port 80 or any other port below 1024. The ``--local`` option tells
+``git-serve`` to listen only on ``127.0.0.1``.
 
 The ``--browser`` option tells ``git-serve`` to automatically start your system's
 default web browser with the URL of the ``git-serve`` server while starting it.
@@ -62,3 +65,5 @@ current shell session, becoming a daemon process that runs in background. This
 is very useful in combination with the ``--pid-file`` option that write the
 process id in the given file.
 
+You can specify the location of the gitweb.cgi file that ``git-serve`` uses
+with the ``--gitweb`` option (e.g. /home/jannis/lib/git/gitweb.cgi).

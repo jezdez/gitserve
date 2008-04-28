@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # encoding: utf-8
 
-__version__ = '0.1.1'
+__version__ = '0.2.0'
 
 import os
 import sys
@@ -11,10 +11,10 @@ from urllib import unquote
 from urlparse import urljoin
 from optparse import OptionParser
 from BaseHTTPServer import HTTPServer
-from socket import gethostname, gethostbyaddr
+from pkg_resources import resource_filename
 from CGIHTTPServer import CGIHTTPRequestHandler
-
-gitserve_dir = os.path.dirname(os.path.abspath(__file__))
+from socket import error as SocketError
+from socket import gethostname, gethostbyaddr
 
 def become_daemon(home='.', out_log='/dev/null', err_log='/dev/null'):
     "Robustly turn into a UNIX daemon, running in our_home_dir."
@@ -48,9 +48,8 @@ def become_daemon(home='.', out_log='/dev/null', err_log='/dev/null'):
 
 class GitWebRequestHandler(CGIHTTPRequestHandler):
     cgi_directories = []
-    aliases = [
-        ('/media', os.path.join(gitserve_dir, "media")),
-    ]
+    gitserve_media = resource_filename("gitserve", "media")
+    aliases = [('/media', gitserve_media),]
     verbose = False
     
     def log_message(self, format, *args):
@@ -119,7 +118,10 @@ def main():
                       help="port to listen on (default: 8000)", default=8000)
     parser.add_option("-a", "--address",
                       dest="address", default="",
-                      help="address to listen on (default: all interfaces)")
+                      help="address to listen on (default: hostname)")
+    parser.add_option("-l", "--local",
+                      action="store_true", dest="local", default=False,
+                      help="only listen on 127.0.0.1")
     parser.add_option("-b", "--browser",
                       action="store_true", dest="browser", default=False,
                       help="open default browser automatically")
@@ -129,7 +131,17 @@ def main():
     parser.add_option("--pid-file",
                       dest="pidfile", default="",
                       help="write the spawned process-id to this file")
+    parser.add_option("--gitweb",
+                      dest="gitweb", default="",
+                      help="use this gitweb cgi file instead of the included version")
     (options, args) = parser.parse_args()
+
+    # get path to gitweb.cgi file
+    gitweb_cgi = options.gitweb
+    if not gitweb_cgi:
+        gitweb_cgi = resource_filename('gitserve', 'gitweb.cgi')
+    if not os.access(gitweb_cgi, os.X_OK):
+        parser.error("Your gitweb.cgi is not executable. Try 'chmod +x %s'" % gitweb_cgi)
 
     if len(args) > 1:
         parser.error("incorrect number of arguments")
@@ -155,19 +167,21 @@ def main():
     if os.path.exists(os.path.expanduser('~/.gitwebconfig')):
         gitweb_conf = os.path.expanduser('~/.gitwebconfig')
     else:
-        gitweb_conf = os.path.join(gitserve_dir, 'gitweb.conf')
+        gitweb_conf = resource_filename('gitserve', 'gitweb.conf')
     os.environ['GITWEB_CONFIG'] = gitweb_conf
 
-    # get hostname from the system and build urls and path to cgi
-    if not options.address:
-        options.address = gethostname()
-    else:
-        options.address = gethostbyaddr(options.address)[0]
-
-    listen = options.address, options.port
+    # get hostname from the system and build url
+    try:
+        if options.local:
+            options.address = '127.0.0.1'
+        elif not options.address:
+            options.address = gethostname()
+        else:
+            options.address = gethostbyaddr(options.address)[0]
+    except SocketError, e:
+        parser.error(e)
     gitweb_url = "http://%s:%d/%s/" % (options.address, options.port, repo_name)
-    gitweb_cgi = os.path.join(gitserve_dir, 'gitweb.cgi.so')
-
+    
     # start daemon mode
     if options.daemon:
         options.verbose = False
@@ -183,8 +197,7 @@ def main():
     GitWebRequestHandler.verbose = options.verbose
     GitWebRequestHandler.cgi_directories.append('/%s' % repo_name)
     GitWebRequestHandler.aliases.append(('/%s' % repo_name, gitweb_cgi))
-
-    httpd = HTTPServer(listen, GitWebRequestHandler)
+    httpd = HTTPServer((options.address, options.port), GitWebRequestHandler)
 
     if options.verbose:
         print "starting gitweb at: %s" % gitweb_url
@@ -197,6 +210,9 @@ def main():
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
+    except SocketError:
+        if options.verbose:
+            raise
 
 if __name__ == "__main__":
     main()

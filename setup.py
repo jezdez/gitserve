@@ -1,14 +1,33 @@
 #!/usr/bin/env python
 
-import os, sys, stat
-from setuptools import setup, find_packages
+import os, sys
+try:
+    from setuptools import find_packages, setup
+    from setuptools.command.easy_install import easy_install
+except ImportError:
+    sys.exit("Please install a recent version of setuptools")
+
+easy_install.real_process_distribution = easy_install.process_distribution
+def process_distribution(self, *args, **kwargs):
+    """Brutally ugly hack to have post_install functionality. oh. my. god."""
+    easy_install.real_process_distribution(self, *args, **kwargs)
+
+    import pkg_resources
+    try:
+        pkg_resources.require("gitserve")
+        gitweb_cgi = pkg_resources.resource_filename("gitserve", "gitweb.cgi")
+        os.chmod(gitweb_cgi, 0755)
+    except:
+        print "Chmodding failed. Try 'chmod +x /path/to/gitserve/gitweb.cgi'"
+easy_install.process_distribution = process_distribution
 
 setup(
     name='gitserve',
-    version='0.1.1',
-    license='GPL2',
+    version='0.2.0',
+    license='GPL-2',
     description="A helper tool for git that mimics mercurial\'s serve command",
-    long_description=open(os.path.join(os.path.dirname(__file__), 'README.txt')).read(),
+    long_description=open('README.txt', 'r').read(),
+    maintainer='Jannis Leidel',
     author='Jannis Leidel',
     author_email='jannis@leidel.info',
     url='http://github.com/jezdez/git-serve/',
@@ -26,10 +45,9 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Internet :: WWW/HTTP :: HTTP Servers',
     ],
-    install_requires=["setuptools"],
     packages=find_packages('src'),
     package_dir={'':'src'},
-    package_data={'': ['media/*.*', '*.so', '*.conf'],},
+    package_data={'': ['media/*.*', '*.cgi', '*.conf'],},
     entry_points={'console_scripts': ['git-serve = gitserve:main',],},
     zip_safe=False,
     include_package_data = True,
