@@ -1,4 +1,4 @@
-git-serve - A helper tool for git that mimics mercurial\'s serve command
+gitserve - A helper tool for git that mimics mercurial\'s serve command
 Copyright (C) 2008  Jannis Leidel
 
 This program is free software; you can redistribute it and/or modify

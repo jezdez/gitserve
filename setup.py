@@ -48,7 +48,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'':'src'},
     package_data={'': ['media/*.*', '*.cgi', '*.conf'],},
-    entry_points={'console_scripts': ['git-serve = gitserve:main',],},
+    entry_points={'console_scripts': ['gitserve = gitserve:main',],},
     zip_safe=False,
     include_package_data = True,
 )

@@ -1,4 +1,4 @@
-Thanks for downloading git-serve.
+Thanks for downloading gitserve.
 
 To install it, run the following command inside this directory:
 
